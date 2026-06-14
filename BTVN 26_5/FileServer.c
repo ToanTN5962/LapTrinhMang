@@ -10,9 +10,8 @@
 
 #define PORT 9000
 #define BUF_SIZE 8192
-#define ROOT_DIR "./FILES"
+#define ROOT_DIR "./"
 
-/* ================= MIME TYPE ================= */
 const char* get_mime_type(const char *path)
 {
     char *ext = strrchr(path, '.');
@@ -30,7 +29,6 @@ const char* get_mime_type(const char *path)
     return "application/octet-stream";
 }
 
-/* ================= URL DECODE ================= */
 void url_decode(char *dst, const char *src)
 {
     char a, b;
@@ -59,7 +57,6 @@ void url_decode(char *dst, const char *src)
     *dst = 0;
 }
 
-/* ================= 404 ================= */
 void send_404(int client)
 {
     char *body = "<html><body><h1>404 Not Found</h1></body></html>";
@@ -76,7 +73,6 @@ void send_404(int client)
     send(client, response, strlen(response), 0);
 }
 
-/* ================= DIRECTORY LISTING ================= */
 void send_directory_listing(int client, const char *path, const char *url_path)
 {
     DIR *dir = opendir(path);
@@ -150,7 +146,6 @@ void send_directory_listing(int client, const char *path, const char *url_path)
     send(client, html, strlen(html), 0);
 }
 
-/* ================= FILE SENDER ================= */
 void send_file(int client, const char *path)
 {
     FILE *f = fopen(path, "rb");
@@ -189,7 +184,6 @@ void send_file(int client, const char *path)
     fclose(f);
 }
 
-/* ================= MAIN ================= */
 int main()
 {
     int server = socket(AF_INET, SOCK_STREAM, 0);
@@ -205,7 +199,7 @@ int main()
     bind(server, (struct sockaddr*)&addr, sizeof(addr));
     listen(server, 10);
 
-    printf("HTTP File Server listening on %d\n", PORT);
+    printf("Server is listening on port %d\n", PORT);
 
     while (1)
     {
@@ -229,13 +223,11 @@ int main()
 
         printf("%s %s\n", method, url);
 
-        /* ===== decode URL ===== */
         char decoded_url[1024];
         url_decode(decoded_url, url);
 
         char path[2048];
 
-        /* root fix */
         if (!strcmp(decoded_url, "/"))
         {
             snprintf(path, sizeof(path), "%s", ROOT_DIR);
